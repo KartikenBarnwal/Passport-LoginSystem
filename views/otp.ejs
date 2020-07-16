@@ -1,8 +1,25 @@
-body{
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="index.css">
+   <link rel="icon" href="https://lh3.googleusercontent.com/a-/AOh14GhOePmZG8g0wja3nBL_o7igPEyY8svB8UQuXjC4Gg=s120-cc-rg" type="image/icon type">
+    <title>Sign Up</title>
+    <!-- https://cdn.wallpapersafari.com/92/64/hBkoyj.jpg -->
+    <style>
+        #box{
+            width: 300px;
+        }
+        input
+        {
+            margin-top: 40px;
+        }
+        body{
     margin: 0;
     padding: 0;
     /* background-image: url('https://ak2.picdn.net/shutterstock/videos/17312992/thumb/1.jpg'); */
     background-image: url('greenbg2.jpg');
+    /* background-color: red; */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -166,3 +183,39 @@ form #txt4{
     
 
   }
+    </style>
+    <script>
+       
+    
+        function validate()
+        {
+            var otp=document.getElementById("otp");
+            if(otp.value.trim()=="")
+            {
+                otp.style.borderColor="red";
+                alert("Enter OTP!");
+                return false;
+            }
+        }
+        
+        function offline()
+        {
+            alert("Oops! Make sure have an internet connection...")
+            
+        }
+    </script>
+</head>
+<body onoffline="offline()">
+    <div id="box">
+        <div id="leftbox">
+            <h1>Forgot Password</h1>
+            <h1><%= user.name %></h1>
+            <form onsubmit="return validate()" action="/users/update/<%= user._id %>" method="POST">
+                <input type="text" name="otp" placeholder="Enter OTP sent to your Email" id="otp" spellcheck="false" autofocus> 
+                <input type="submit">
+            </form>
+            <a href="/">Create an Account?</a>
+        </div>
+    </div>
+</body>
+</html>

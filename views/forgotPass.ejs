@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="index.css">
+   <link rel="icon" href="https://lh3.googleusercontent.com/a-/AOh14GhOePmZG8g0wja3nBL_o7igPEyY8svB8UQuXjC4Gg=s120-cc-rg" type="image/icon type">
+    <title>Sign Up</title>
+    <!-- https://cdn.wallpapersafari.com/92/64/hBkoyj.jpg -->
+    <style>
+        #box{
+            width: 300px;
+        }
+        input
+        {
+            margin-top: 40px;
+        }
+    </style>
+    <script>
+       
+    
+        function validate()
+        {
+            var email=document.getElementById("email");
+            var password=document.getElementById("pass");
+            if(email.value.trim()=="")
+            {
+                email.style.borderColor="red";
+                alert("Blank Email!");
+                return false;
+            }
+            else if(password.value.trim()=="")
+            {
+                password.style.borderColor="red";
+                alert("Blank password!");
+                return false;
+            }
+        }
+        
+        function offline()
+        {
+            alert("Oops! Make sure have an internet connection...")
+            
+        }
+    </script>
+</head>
+<body onoffline="offline()">
+    <div id="box">
+        <div id="leftbox">
+            <h1>Forgot Password</h1>
+            <form onsubmit="return validate()" action="/users/update" method="POST">
+                <input type="email" name="email" placeholder="Enter Email" id="email" spellcheck="false"> 
+                <input type="submit">
+            </form>
+            <a href="/">Create an Account?</a>
+        </div>
+    </div>
+</body>
+</html>
