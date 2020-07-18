@@ -83,7 +83,7 @@
         
         form #txt4{
             position: absolute;
-            top: 72%;
+            top: 60%;
             color: red;
             font-size: 9px;
         }
@@ -110,12 +110,49 @@
     <script>
         function validate()
         {
-            var otp=document.getElementById("otp");
-            if(otp.value.trim()=="")
+            var password=document.getElementById("pass");
+            var rpassword=document.getElementById("rpass");
+
+            if(password.value.trim()=="")
             {
-                otp.style.borderColor="red";
-                alert("Enter OTP!");
+                password.style.borderColor="red";
+                alert("Blank password!");
                 return false;
+            }
+            else if(rpassword.value.trim()=="")
+            {
+                rpassword.style.borderColor="red";
+                alert("Confirm Password!");
+                return false;
+            }
+            else if(rpass.value!=pass.value)
+            {
+                alert("Password did not Matched!")
+            }
+        }
+        function passwordvalidate()
+        {
+            var pass=document.getElementById("pass");
+            var rpass=document.getElementById("rpass");
+            if(pass.value.length>=8 && pass.value.length<=16)
+            {
+                pass.style.borderColor="#00FF00";
+            }
+            else
+            {
+                pass.style.borderColor="red"
+            }
+
+            if(rpass.value==pass.value&&pass.value.trim()!="")
+            {
+                rpass.style.borderColor="#00FF00";
+                document.getElementById("txt4").style.color="green";
+                document.getElementById("txt4").innerHTML="Password matched."
+            }
+            else
+            {
+                rpass.style.borderColor="red";
+                document.getElementById("txt4").innerHTML="Password did not match.";
             }
         }
         
@@ -130,9 +167,9 @@
     <div id="box">
         <div id="leftbox">
             <h1>Forgot Password</h1>
-            <form onsubmit="return validate()" action="/users/update/<%= user.id %>" method="POST">
-                <input type="text" name="otp" placeholder="Enter OTP sent to your Email" id="otp" spellcheck="false" autofocus> 
-                <input type="submit">
+            <form onsubmit="return validate()" action="/users/updatePassword/<%= user.id %>" method="POST">
+                <input type="password" name="password" placeholder="Password (8-12 characters)" id="pass" onkeyup="passwordvalidate()" name="password">
+                <input type="password" placeholder="Confirm Password" id="rpass" onkeyup="passwordvalidate();" name="rpassword"><br><span id="txt4"></span>                <input type="submit">
             </form>
             <a href="/">Create an Account?</a>
         </div>

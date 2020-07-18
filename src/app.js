@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const User = require('./userModel')
 const auth = require('./auth')
@@ -30,7 +31,6 @@ app.use(methodOverride('_method'))
 app.get('',(req,res)=>{
     res.render('index')
     console.log('ok')
-    // res.send({message:'ok'})
 })
 app.use(express.static(publicDirPath))
 
@@ -38,13 +38,21 @@ app.get('/login',(req,res)=>{
     res.render('login')
 })
 
+app.get('/users/update',async(req,res)=>{
+    try{
+        res.render('otp')
+    }catch(e)
+    {
+        console.log(e)
+    }
+})
 
 app.post('/users/signup',async(req,res)=>{
     const user = new User(req.body)
     try{
         await user.save()
         const token = await user.generateAuthToken()
-        res.send({user,token})
+        res.redirect('/login')
     }catch(e){
         res.status(400).send(e)
     }
@@ -70,20 +78,32 @@ app.get('/forgotPass',(req,res)=>{
 
 app.post('/users/update/:id',async(req,res)=>{
     try{
-        // console.log(req.body)
-        const user = await User.findOne({_id:req.params.id}).lean()
-        // const decode = await bcrypt.compare(req.params.pass,req.body.otp)
-        if(1)
+        const user = await User.findOne({_id:req.params.id})
+        const decode = await bcrypt.compare(req.body.otp,user.pass)
+        console.log(decode)
+
+        if(decode)
         {
-            // res.render('changePass')
-            res.send({message: 'Authenticated'})
-            console.log('hmm')
+            res.render('changePass',{user})
         }
         else
         {
             res.send({message:'error'})
         }
 
+    }catch(e){
+        res.status(400).send(e)
+    }
+})
+
+app.post('/users/updatePassword/:id',async(req,res)=>{
+    try{
+        const user = await User.findOne({_id:req.params.id})
+        user.password = req.body.password
+        user.pass = '0'
+        await user.save()
+        res.redirect('/login')
+        
     }catch(e){
         res.status(400).send(e)
     }
@@ -96,32 +116,34 @@ app.post('/users/update',async(req,res)=>{
         {
             return res.send({message:"Email ID not registered!"})
         }
-        // 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
         const otp = Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()+Math.floor(Math.random()*10).toString()
         const pass = await bcrypt.hash(otp,8)
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-              user: 'vishalkrb123@gmail.com',
-              pass: 'vishal'
+              user: process.env.EMAIL,
+              pass: process.env.PASSWORD
             }
           });
 
           var mailOptions = {
-            from: 'vishalkrb123@gmail.com',
-            to: 'prahlad@gmail.com',
+            from:  process.env.EMAIL,
+            to: user.email,
             subject: 'Verification Email',
             text: `Hello, ${user.name}! Please verify with the following OTP`,
             html:'<h1>'+otp+'</h1>'
           };
           
-          transporter.sendMail(mailOptions, function(error, info){
+          transporter.sendMail(mailOptions, async function(error, info){
             if (error) {
               console.log(error);
             } else {
               console.log('Email sent: ' + info.response);
               const updatedUser = {...user, pass: pass}
-              res.render('otp',{user:updatedUser})
+              user.pass = pass
+              await user.save()
+              res.render('otp',{user})
+            // res.redirect('/users/update/'+user._id)
 
             }
           });
@@ -163,15 +185,3 @@ app.delete('/users/delete', auth ,async(req,res)=>{
 app.listen(port,()=>{
     console.log('Server is up on port '+ port)
 })
-
-// const sgMail = require('@sendgrid/mail');
-// sgMail.setApiKey('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');
-// const msg = {
-//   to: 'vishalkrb123@gmail.com',
-//   from: 'kartikenkrb@gmail.com',
-//   subject: 'Sending with Twilio SendGrid is Fun',
-//   text: 'and easy to do anywhere, even with Node.js',
-//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-// };
-// sgMail.send(msg);
-// console.log('check   ')

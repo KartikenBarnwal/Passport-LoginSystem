@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://localhost:27017/Login-System',{
+mongoose.connect(process.env.MONGO_Connect,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
