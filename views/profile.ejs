@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template-LoginSystem</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background-image: url('https://wallpapercave.com/wp/wp2672841.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-size: 16px;
+            font-family: sans-serif;
+            font-weight: 300;
+        }
+        #box{
+            width: 300px;
+            position: relative;
+            margin: 5% auto;
+            height: 400px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); 
+            transition: ease 0.4s;
+            text-align: center;
+        }
+        #box h1{
+            padding-top: 40px;
+        }
+        #box h1 span{
+            background-color: #f44336;
+            color: #fff;
+            padding: 10px;
+            text-transform: capitalize;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <h1>Hello, <span><%= user.name %></span>!<hr> How are you doing?</h1>
+        <!-- <form action="/users/logout" method="POST"></form> -->
+            <button onclick="logout()">LOGOUT</button>
+        <!-- </form> -->
+    </div>
+
+    <script>
+
+        var userToken = document.cookie.replace('jwt=','')
+        // console.log(document.cookie)
+        console.log(userToken)
+
+        function logout()
+        {
+            fetch('/users/logout', {
+                method: 'POST',
+                headers: {
+                'Authorization': 'Bearer ' + userToken
+                }
+            })
+            .then(res => res.json())
+            .then(data => { console.log(data) })
+            .catch(err => { console.log(err) })
+        }
+        
+    </script>
+</body>
+</html>

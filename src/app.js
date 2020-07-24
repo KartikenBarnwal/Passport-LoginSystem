@@ -6,13 +6,14 @@ const path = require('path')
 const methodOverride = require('method-override')
 var nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs')
+const profileRouter = require('../routes/profileRouter')
 
 require('./db/mongoose')
 
 const app = express()
 const port = process.env.PORT || 3000
 
-// app.use(express.json())
+app.use(express.json())
 const publicDirPath=path.join(__dirname,'../public')
 const viewsPath=path.join(__dirname,'../views')
 
@@ -21,7 +22,21 @@ app.set('views',viewsPath)
 
 app.use(express.urlencoded({extended:false}))
 app.use(methodOverride('_method'))
+app.use('/profile',profileRouter)
 
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
+// app.use(function (req, res, next) {
+//     var cookie = req.cookies.jwtToken;
+//     if (!cookie) {
+//       res.cookie('jwtToken', theJwtTokenValue, { maxAge: 900000, httpOnly: true });
+//     } else {
+//       console.log('lets check that this is a valid cookie');
+//       // send cookie along to the validation functions...
+//     }
+//     next();
+//   });
 //In case of maintenance:- 
 // app.use((req,res,next)=>{
 //     res.status(503).send({"message":"The service is currently unavailable. Please come back later!"})
@@ -33,6 +48,7 @@ app.get('',(req,res)=>{
     console.log('ok')
 })
 app.use(express.static(publicDirPath))
+app.use('/profile',profileRouter)
 
 app.get('/login',(req,res)=>{
     res.render('login')
@@ -61,15 +77,24 @@ app.post('/users/signup',async(req,res)=>{
 app.post('/users/login',async(req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email,req.body.password)
+        if(user==null)
+        {
+            return res.send({message:'Authentication Failed!'})
+        }
         const token = await user.generateAuthToken()
-        res.send({user,token})
+        
+        //setting up cookie for the client!
+        res.cookie('jwt', token, {
+            httpOnly: false,
+            maxAge: 24*60*60*1000,
+            secure: false
+        })
+
+        // res.send({user,token})
+        res.redirect('/profile/'+user._id)
     }catch(e){
         res.status(404).send()
     }
-})
-
-app.get('/users/readProfile', auth ,async(req,res)=>{
-    res.send(req.user)
 })
 
 app.get('/forgotPass',(req,res)=>{
@@ -157,7 +182,9 @@ app.post('/users/logout', auth ,async(req,res)=>{
     try{
         req.user.tokens = req.user.tokens.filter((token)=>{return token.token!=req.token})
         await req.user.save()
-        res.status(200).send({message:'Logged Out Successfully!'})
+        // res.status(200).send({message:'Logged Out Successfully!'})
+        console.log('Logged Out Successfully!')
+        res.redirect('/')
     }catch(e){
         res.status(400).send(e)
     }
