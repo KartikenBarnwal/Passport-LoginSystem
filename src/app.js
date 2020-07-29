@@ -43,7 +43,7 @@ app.use(cookieParser())
 // })
 
 
-app.get('',(req,res)=>{
+app.get('/',(req,res)=>{
     res.render('index')
     console.log('ok')
 })
@@ -182,19 +182,18 @@ app.post('/users/logout', auth ,async(req,res)=>{
     try{
         req.user.tokens = req.user.tokens.filter((token)=>{return token.token!=req.token})
         await req.user.save()
-        // res.status(200).send({message:'Logged Out Successfully!'})
         console.log('Logged Out Successfully!')
-        res.redirect('/')
+        res.redirect('/login')
     }catch(e){
         res.status(400).send(e)
     }
 })
 
-app.post('/users/logoutALL', auth ,async(req,res)=>{
+app.post('/users/logoutAll', auth ,async(req,res)=>{
     try{
         req.user.tokens = []
         await req.user.save()
-        res.status(200).send({message:'Logged Out Successfully!'})
+        res.redirect('/login')
     }catch(e){
         res.status(400).send(e)
     }
@@ -203,7 +202,7 @@ app.post('/users/logoutALL', auth ,async(req,res)=>{
 app.delete('/users/delete', auth ,async(req,res)=>{
     try{
         const user = await User.findByIdAndDelete(req.user._id)
-        res.send(user)
+        res.redirect('/')
     }catch(e){
         res.status(400).send(e)
     }
